@@ -21,7 +21,7 @@ const ReviewFormContainer = styled.form`
 export default function ReviewForm({ onCancelClicked, editMode, restaurantId, reviewId }) {
 	const [{ admin }, dispatch] = useStateValue();
 	const [content, setContent] = useState("");
-	const [rate, setRate] = useState(0);
+	const [rate, setRate] = useState("default");
 	let closeForm = () => {
 		onCancelClicked(false);
 	};
@@ -54,12 +54,14 @@ export default function ReviewForm({ onCancelClicked, editMode, restaurantId, re
 			<div>
 				<label htmlFor="review_rating_select">Rate: </label>
 				<select onChange={(e) => setRate(e.target.value)} id="review_rating_select">
-					<option value="">Choose</option>
+					<option value="default">Choose</option>
 					<option value="1">1</option>
 					<option value="2">2</option>
 					<option value="3">3</option>
 				</select>
-				<button type="submit">{editMode === "edit" ? "Edit" : "Add"}</button>
+				<button type="submit" disabled={rate === "default" || content === ""}>
+					{editMode === "edit" ? "Edit" : "Add"}
+				</button>
 				<button onClick={closeForm}>Cancel</button>
 			</div>
 		</ReviewFormContainer>
