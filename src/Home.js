@@ -1,53 +1,84 @@
 import React, { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import List from "./component/List";
 import styled from "styled-components";
-import { useStateValue } from "./StateProvider";
+import { useStateValue } from "./hooks/StateProvider";
 import useDebounce from "./hooks/useDebounce";
-import Restaurant from "./component/Restaurant";
+import DispatchEvent from "./dispatchEventList";
+
+const HomeContainer = styled.div`
+	width: 50%;
+	position: relative;
+	margin: auto;
+	.search_container {
+		margin-top: 10px;
+		width: 100%;
+		height: 70px;
+		display: flex;
+		align-items: flex-start;
+		justify-content: space-around;
+		flex-direction: column;
+		box-sizing: border-box;
+		padding: 5px 0;
+		& input {
+			height: 20px;
+		}
+		& button {
+			margin-right: 10px;
+		}
+	}
+`;
 
 export default function Home() {
+	const location = useLocation();
 	const [searchInput, setSearchInput] = useState("");
 	const [{ restaurants }, dispatch] = useStateValue();
-	let [results, setResults] = useState();
-	let [sortAscend, setSortAscend] = useState(1);
-
+	const [results, setResults] = useState();
+	const [sortAscend, setSortAscend] = useState(1);
 	const debouncedInput = useDebounce(searchInput, 500);
+
+	useEffect(() => {
+		dispatch({ type: DispatchEvent.RATE_AVG });
+	}, [location]);
 
 	useEffect(() => {
 		if (debouncedInput) {
 			let regExp = new RegExp(searchInput, "i");
-			setResults(
-				restaurants.filter((restaurant) =>
-					regExp.test(restaurant.name.replace(" ", "").toLowerCase())
-				)
-			);
+			setResults(restaurants.filter((restaurant) => regExp.test(restaurant.name.toLowerCase())));
 		} else {
 			setResults(restaurants);
 		}
 	}, [debouncedInput]);
 
 	let handleInputChange = (e) => {
-		setSearchInput(e.target.value.replace(" ", "").toLowerCase());
+		setSearchInput(e.target.value.toLowerCase());
 	};
 
+	//sort by name or rate
 	let handleSortClick = (type) => {
 		let sortedData = [...restaurants].sort(function (a, b) {
 			return a[type] > b[type] ? sortAscend : -sortAscend;
 		});
 		setSortAscend(-sortAscend);
 		setResults(sortedData);
+		setSearchInput("");
 	};
 
 	return (
-		<div className="home_container">
+		<HomeContainer>
 			<div className="search_container">
-				<input placeholder="Search..." type="text" onChange={handleInputChange} />
+				<input
+					placeholder="Search..."
+					type="text"
+					value={searchInput}
+					onChange={handleInputChange}
+				/>
 				<div>
 					<button onClick={() => handleSortClick("name")}>Sort by name</button>
 					<button onClick={() => handleSortClick("rate")}>Sort by rate</button>
 				</div>
 			</div>
 			<List restaurants={results || restaurants}></List>
-		</div>
+		</HomeContainer>
 	);
 }
