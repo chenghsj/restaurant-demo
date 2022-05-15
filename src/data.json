@@ -1,0 +1,105 @@
+{
+	"restaurants": [
+		{
+			"name": "The King's Eats",
+			"id": "res0",
+			"rate": 0,
+			"reviews": [
+				{
+					"rate": 3,
+					"id": "rev0",
+					"userId": "user4",
+					"content": "Lorem ipsum dolor sit amet consectetur adipisicing elit."
+				},
+				{
+					"rate": 2,
+					"id": "rev1",
+					"userId": "user1",
+					"content": "Lorem ipsum dolor sit amet consectetur adipisicing elit."
+				},
+				{
+					"rate": 1,
+					"id": "rev2",
+					"userId": "user2",
+					"content": "Lorem ipsum dolor sit amet consectetur adipisicing elit."
+				},
+				{
+					"rate": 1,
+					"id": "rev3",
+					"userId": "user4",
+					"content": "Lorem ipsum dolor sit amet consectetur adipisicing elit."
+				}
+			]
+		},
+		{
+			"name": "The Mountain Club",
+			"id": "res1",
+			"rate": 0,
+			"reviews": [
+				{
+					"rate": 2,
+					"id": "rev0",
+					"userId": "user3",
+					"content": "Lorem ipsum dolor sit amet consectetur adipisicing elit."
+				},
+				{
+					"rate": 3,
+					"id": "rev1",
+					"userId": "user4",
+					"content": "Lorem ipsum dolor sit amet consectetur adipisicing elit."
+				}
+			]
+		},
+		{
+			"name": "Potroast",
+			"id": "res2",
+			"rate": 0,
+			"reviews": [
+				{
+					"rate": 3,
+					"id": "rev0",
+					"userId": "user1",
+					"content": "Lorem ipsum dolor sit amet consectetur adipisicing elit."
+				},
+				{
+					"rate": 3,
+					"id": "rev1",
+					"userId": "user2",
+					"content": "Lorem ipsum dolor sit amet consectetur adipisicing elit."
+				}
+			]
+		},
+		{
+			"name": "The Square Factory",
+			"id": "res3",
+			"rate": 0,
+			"reviews": [
+				{
+					"rate": 2,
+					"id": "rev0",
+					"userId": "user1",
+					"content": "Lorem ipsum dolor sit amet consectetur adipisicing elit."
+				},
+				{
+					"rate": 3,
+					"id": "rev1",
+					"userId": "user3",
+					"content": "Lorem ipsum dolor sit amet consectetur adipisicing elit."
+				},
+				{
+					"rate": 3,
+					"id": "rev2",
+					"userId": "user4",
+					"content": "Lorem ipsum dolor sit amet consectetur adipisicing elit."
+				}
+			]
+		}
+	],
+	"users": [
+		{ "name": "John", "id": "user1" },
+		{ "name": "Jack", "id": "user2" },
+		{ "name": "Hue", "id": "user3" },
+		{ "name": "Polo", "id": "user4" }
+	],
+	"admin": { "name": "John", "id": "user1" }
+}
