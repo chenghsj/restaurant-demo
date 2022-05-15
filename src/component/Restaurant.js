@@ -5,11 +5,11 @@ import styled from "styled-components";
 
 export default function Restaurant() {
 	const params = useParams();
-	const [{ restaurants }, dispatch] = useStateValue();
+	const [{ restaurants, users, admin }, dispatch] = useStateValue();
 
 	let restaurant = restaurants.filter((item) => item.id === params.Id)[0];
-
 	console.log(restaurant);
+
 	const Container = styled.div`
 		width: 80%;
 		height: 80%;
@@ -37,6 +37,7 @@ export default function Restaurant() {
 		.review {
 			height: 30%;
 			border-bottom: 1px solid black;
+			padding: 0 1rem;
 		}
 		.user {
 			display: flex;
@@ -52,7 +53,9 @@ export default function Restaurant() {
 					return (
 						<div className="review">
 							<div>{review.content}</div>
-							<div className="user">User: {review.userId}</div>
+							<div className="user">
+								User: {users.filter((user) => review.userId === user.id)[0].name}
+							</div>
 						</div>
 					);
 				})}

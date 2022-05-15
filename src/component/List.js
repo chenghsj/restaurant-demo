@@ -1,11 +1,7 @@
 import React from "react";
-import data from "../data";
-import { v4 as uuidv4 } from "uuid";
 import { Link } from "react-router-dom";
-import { useStateValue } from "../StateProvider";
 
-export default function List() {
-	const [{ restaurants }, dispatch] = useStateValue();
+export default function List({ restaurants }) {
 	return (
 		<div>
 			<ul className="restaurant_list">

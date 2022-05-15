@@ -9,7 +9,6 @@ export default function Header() {
 		border: 1px solid black;
 		position: sticky;
 		top: 0;
-		z-index: 1000;
 		display: flex;
 		justify-content: center;
 		align-items: center;
