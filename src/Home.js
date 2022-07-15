@@ -5,6 +5,7 @@ import styled from "styled-components";
 import { useStateValue } from "./hooks/StateProvider";
 import useDebounce from "./hooks/useDebounce";
 import DispatchEvent from "./dispatchEventList";
+import { Button, Input } from 'antd';
 
 const HomeContainer = styled.div`
 	width: 50%;
@@ -67,15 +68,11 @@ export default function Home() {
 	return (
 		<HomeContainer>
 			<div className="search_container">
-				<input
-					placeholder="Search..."
-					type="text"
-					value={searchInput}
-					onChange={handleInputChange}
-				/>
+				<Input size="small" placeholder="Search..." value={searchInput}
+					onChange={handleInputChange} />
 				<div>
-					<button onClick={() => handleSortClick("name")}>Sort by name</button>
-					<button onClick={() => handleSortClick("rate")}>Sort by rate</button>
+					<Button shape='round' size="small" onClick={() => handleSortClick("name")}>Sort by name</Button>
+					<Button shape='round' size="small" onClick={() => handleSortClick("rate")}>Sort by rate</Button>
 				</div>
 			</div>
 			<List restaurants={results || restaurants}></List>

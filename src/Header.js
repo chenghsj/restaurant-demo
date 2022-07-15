@@ -7,13 +7,14 @@ const Container = styled.div`
 	padding: 0 20px;
 	width: 100%;
 	height: 50px;
-	border-bottom: 1px solid black;
 	position: sticky;
+	background: #303030;
 	top: 0;
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
 	box-sizing: border-box;
+	color: white;
 	a {
 		text-decoration: none;
 	}
