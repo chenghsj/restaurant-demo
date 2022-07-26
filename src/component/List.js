@@ -14,10 +14,24 @@ export default function List({ restaurants }) {
 			title: 'Rate',
 			dataIndex: 'rate',
 			key: 'rate',
+			align: "center",
 			render: (text, record) => <span>{record.rate}</span>
-		}
+		},
+		{
+			title: 'Reviews',
+			dataIndex: 'reviews',
+			key: 'review',
+			align: "center",
+			render: (text, record, index) => <span>{record.reviews.length}</span>
+		},
 	]
+
 	return (
-		<Table columns={columns} dataSource={restaurants} pagination={{ pageSize: 10 }} />
+		<Table
+			rowKey={record => record.id}
+			columns={columns}
+			dataSource={restaurants}
+			pagination={{ pageSize: 10 }}
+		/>
 	);
 }

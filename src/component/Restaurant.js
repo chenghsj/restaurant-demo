@@ -1,10 +1,10 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect, Fragment } from "react";
 import { useStateValue } from "../hooks/StateProvider";
 import { useParams } from "react-router-dom";
 import styled from "styled-components";
 import ReviewForm from "./ReviewForm";
 import DispatchEvent from "../dispatchEventList";
-import { Row, Col, Button, Card, Modal, Avatar, Icon, Rate } from 'antd';
+import { Button, Modal, Avatar, Icon, Comment, Tooltip, Divider, Pagination, Row, Col, Menu, Dropdown, Checkbox } from 'antd';
 
 const Container = styled.div`
 	width: 80%;
@@ -21,7 +21,6 @@ const Container = styled.div`
 		height: 50px;
 		display: flex;
 		align-items: center;
-		padding-left: 1rem;
 		box-sizing: border-box;
 		font-weight: bold;
 	}
@@ -40,7 +39,6 @@ const Container = styled.div`
 		flex-direction: column;
 		justify-content: center;
 	}
-	}
 `;
 
 export default function Restaurant() {
@@ -51,87 +49,226 @@ export default function Restaurant() {
 	const [reviewId, setReviewId] = useState("");
 	const [buttonDisabled, setButtonDisabled] = useState(true)
 	const [reviewModalVisible, setReviewModalVisible] = useState(false);
+	const [checkboxVisible, setCheckboxVisible] = useState(false);
+	const [checkedList, setCheckedList] = useState([])
 	const restaurant = restaurants.filter((item) => item.id === params.Id)[0];
+	// pagination
+	const pageSize = 3;
+	const [pageData, setPageData] = useState({
+		totalPage: 0,
+		current: 1,
+		minIndex: 0,
+		maxIndex: 0
+	})
 
-	let handleDeleted = (reviewId) => {
-		dispatch({ type: DispatchEvent.DELETE_REVIEW, reviewId, restaurantId: restaurant.id });
+	useEffect(() => {
+
+	})
+
+	useEffect(() => {
+		let totalPage = Math.ceil(restaurant.reviews.length / pageSize);
+		setPageData({ ...pageData, totalPage, maxIndex: pageSize })
+	}, [])
+
+	const isAdmin = (review) => {
+		return admin.id === review.userId;
+	}
+
+	// user comment edit and delete buttons
+	const actions = (review) => {
+		let admin = isAdmin(review)
+		return [
+			<Tooltip title="Rate">
+				<span
+					style={{ paddingRight: "20px", cursor: "default" }}
+					key="rate-icon">
+					<Icon
+						style={{ color: "#ffd60b", fontSize: "1rem" }}
+						theme="filled"
+						type="star" /> : {review.rate}
+				</span>
+			</Tooltip>,
+			admin && !checkboxVisible && <span key="edit-icon">
+				<Tooltip title="Edit">
+					<Icon type="edit" theme="filled" onClick={() => {
+						setEditMode("edit");
+						setReviewId(review.id);
+						setReviewModalVisible(true);
+						setButtonDisabled(false);
+					}} />
+				</Tooltip>
+			</span>,
+			admin && !checkboxVisible && <span key='delete-icon'>
+				<Tooltip title="Delete">
+					<Icon
+						style={{ color: "red" }}
+						type="delete"
+						theme="filled"
+						onClick={() => {
+							confirm([review.id]);
+						}} />
+				</Tooltip>
+			</span>
+		]
 	};
 
-	function confirm(reviewId) {
+	const optionMenu = (
+		<Menu>
+			<Menu.Item
+				disabled={!restaurant?.reviews.some(review => review.userId === admin.id)}
+				onClick={() => {
+					setCheckboxVisible(true);
+				}}
+			>
+				Edit
+			</Menu.Item>
+		</Menu>)
+
+	const handleDelete = (removedArr) => {
+		dispatch({ type: DispatchEvent.DELETE_REVIEW, reviewIdArr: removedArr, restaurantId: restaurant.id });
+		setCheckboxVisible(false);
+		setCheckedList([]);
+		// if the review is the last one of the page, then show previous page
+		if (pageSize * (pageData.current - 1) + 1 === restaurant.reviews.length) {
+			handlePageChange(pageData.current - 1)
+		}
+	}
+
+	const confirm = (reviewIdArr) =>
 		Modal.confirm({
 			title: 'Confirm',
-			content: 'Are you sure you want to remove this comment?',
+			content: `Are you sure you want to remove ${reviewIdArr.length > 1 ? "these" : "this"} comment?`,
 			okText: 'Confirm',
 			cancelText: 'Cancel',
 			onOk: () => {
-				handleDeleted(reviewId);
+				handleDelete(reviewIdArr);
 			}
 		});
+
+	const handleCheckboxGroupChange = (checkedValue) => {
+		setCheckedList(checkedValue);
+	}
+
+
+	const handlePageChange = (page) => {
+		setPageData(prev => ({
+			...prev,
+			current: page,
+			minIndex: (page - 1) * pageSize,
+			maxIndex: page * pageSize
+		}))
 	}
 
 	return (
 		<Container>
-			<div className="restaurant_title">{restaurant.name}</div>
+			<Row type="flex" justify="space-between" align="middle">
+				<Col span={8}>
+					{checkboxVisible &&
+						<Checkbox
+							style={{ paddingLeft: "15px" }}
+							onChange={() => { }}
+						/>}
+				</Col>
+				<Col span={8}>
+					<Row className="restaurant_title" type="flex" justify="center" >
+						{restaurant.name}
+					</Row>
+				</Col>
+				<Col span={8}>
+					<Row type="flex" justify="end">
+						{
+							checkboxVisible ?
+								<>
+									<Button
+										style={{ marginRight: "10px" }}
+										size="small"
+										onClick={() => {
+											setCheckboxVisible(false);
+											setCheckedList([]);
+										}}>
+										Close
+									</Button>
+									<Button
+										type="danger"
+										size="small"
+										disabled={checkedList.length > 0 ? false : true}
+										onClick={() => confirm(checkedList)}
+									>
+										Delete
+									</Button>
+								</> :
+								<Dropdown overlay={optionMenu} trigger={['click']}>
+									<Button
+										style={{ padding: "0 10px" }}
+									>
+										<Icon style={{ fontSize: "20px", transform: "rotate(90deg)" }} type="more" />
+									</Button>
+								</Dropdown>
+						}
+					</Row>
+				</Col>
+			</Row>
 			<div className="review_container">
-				{restaurant.reviews.map((review) => {
-					return (
-						<Card key={review.id} >
-							<Row>
-								<Col span={3}>
-									<Row>
-										<Avatar icon="user" size={30} />
-									</Row>
-									<Row>
-										<span style={{ color: '#ff5f5f', fontWeight: "bold" }}>{users.filter((user) => review.userId === user.id)[0].name}</span>
-									</Row>
-								</Col>
-								<Col>
-									<Row style={{overflowWrap: "anywhere"}}>
-										<Col>{review.content}</Col>
-									</Row>
-									<Row type="flex" justify="end" align="bottom" style={{marginTop: "10px"}}>
-										{admin.id === review.userId && (
-											<Col span={21}>
-												<Button.Group size="small">
-													<Button
-														onClick={() => {
-															setEditMode("edit");
-															setReviewId(review.id);
-															setReviewModalVisible(true);
-															setButtonDisabled(false);
-														}}>
-														<Icon type="edit" theme="filled"></Icon>
-													</Button>
-													<Button style={{ color: "#ff4d4f" }} onClick={() => {
-														// setDeleteModalVisible(true);
-														confirm(review.id);
-														// handleDeleted(review.id)
-													}}>
-														<Icon type="delete" theme="filled"></Icon>
-													</Button>
-
-												</Button.Group>
-											</Col>
-										)}
-										<Col span={3}>
-											<Icon style={{ color: "#ffd60b", fontSize: "1rem" }} theme="filled" type="star" /> : {review.rate}
+				<Checkbox.Group
+					style={{ width: "100%" }}
+					value={checkedList}
+					onChange={handleCheckboxGroupChange}
+				>
+					{restaurant.reviews.map((review, index) => {
+						return (
+							index >= pageData.minIndex &&
+							index < pageData.maxIndex &&
+							(<Fragment key={index}>
+								<Row type="flex" align="middle">
+									{checkboxVisible && isAdmin(review) &&
+										<Col>
+											<Checkbox
+												value={review.id}
+												style={{ marginRight: "10px" }}>
+											</Checkbox>
 										</Col>
-									</Row>
-								</Col>
-							</Row>
-						</Card>
-					);
-				})}
+									}
+									<Col>
+										<Comment
+											author={users.filter((user) => review.userId === user.id)[0].name}
+											avatar={<Avatar style={{ cursor: "default" }} icon="user" size={30} />}
+											actions={actions(review)}
+											content={<Tooltip title="Comment">{review.content}</Tooltip>} />
+									</Col>
+								</Row>
+
+								<Divider style={{ margin: "10px 0" }} />
+							</Fragment>)
+						);
+					})}
+				</Checkbox.Group>
 			</div>
 			<>
-				<Button
-					style={{ margin: "10px" }}
-					onClick={() => {
-						setEditMode("add");
-						setReviewModalVisible(true);
-					}}>
-					Add Review
-				</Button>
+				<Row type="flex" justify="space-between" align="middle">
+					<Col>
+						<Pagination
+							disabled={checkboxVisible}
+							defaultCurrent={1}
+							current={pageData.current}
+							pageSize={pageSize}
+							total={restaurant.reviews.length}
+							onChange={handlePageChange}
+						/>
+					</Col>
+					<Col>
+						<Button
+							style={{ margin: "10px" }}
+							type="primary"
+							disabled={checkboxVisible}
+							onClick={() => {
+								setEditMode("add");
+								setReviewModalVisible(true);
+							}}>
+							Add Review
+						</Button>
+					</Col>
+
+				</Row>
 				<Modal
 					visible={reviewModalVisible}
 					okButtonProps={{ htmlType: 'submit', form: 'reviewForm', disabled: buttonDisabled }}
@@ -156,6 +293,6 @@ export default function Restaurant() {
 					/>
 				</Modal>
 			</>
-		</Container>
+		</Container >
 	);
 }
