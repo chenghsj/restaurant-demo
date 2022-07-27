@@ -3,7 +3,7 @@ import { useStateValue } from "../hooks/StateProvider";
 import DispatchEvent from "../dispatchEventList";
 import { Form, Input, Rate, InputNumber, Radio, Row, Tooltip } from "antd";
 
-function ReviewForm({ modalOkButtonDisabled, resetFormOnModalClosed, editMode, restaurant, restaurantId, reviewId, form }, ref) {
+function ReviewForm({ modalOkButtonDisabled, resetFormOnModalClosed, editMode, restaurant, restaurantId, reviewId, form }) {
 	const { getFieldDecorator, resetFields, getFieldsValue } = form;
 	const [{ admin }, dispatch] = useStateValue();
 	const [content, setContent] = useState("");
@@ -101,18 +101,6 @@ function ReviewForm({ modalOkButtonDisabled, resetFormOnModalClosed, editMode, r
 				<Form.Item style={{ marginBottom: 0 }}>
 					<Row>
 						{getFieldDecorator("rate", { initialValue: editMode === "edit" ? getEditReview().rate : 0, rules: [{ required: true }] })(
-							<InputNumber size="small" min={0} max={3} step={0.5} onChange={(val) => {
-								setRate(val);
-								if (val === 0) {
-									modalOkButtonDisabled(true);
-								}
-							}} />
-						)}
-					</Row>
-				</Form.Item>
-				<Form.Item style={{ marginBottom: 0 }}>
-					<Row>
-						{getFieldDecorator("rate", { initialValue: editMode === "edit" ? getEditReview().rate : 0, rules: [{ required: true }] })(
 							<Radio.Group
 								onChange={(val) => {
 									setRate(val);
@@ -122,7 +110,9 @@ function ReviewForm({ modalOkButtonDisabled, resetFormOnModalClosed, editMode, r
 								}}>
 								<Radio value={0}>0</Radio>
 								<Radio value={1}>1</Radio>
+								<Radio value={1.5}>1.5</Radio>
 								<Radio value={2}>2</Radio>
+								<Radio value={2.5}>2.5</Radio>
 								<Radio value={3}>3</Radio>
 							</Radio.Group>
 						)}

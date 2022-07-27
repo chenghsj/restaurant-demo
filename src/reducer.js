@@ -5,10 +5,6 @@ import data from "./data.json";
 
 export const initialState = JSON.parse(JSON.stringify(data));
 
-
-
-
-
 export const reducer = (state, action) => {
 	let restIdx = -1, reviewIdx = -1;
 	let newRestaurants = [...state.restaurants];

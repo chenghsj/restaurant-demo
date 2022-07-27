@@ -1,16 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { AutoComplete, Button, Input, Row, Col } from 'antd';
+import { AutoComplete, Button, Row, Col, Select } from 'antd';
 import { useLocation } from "react-router-dom";
 import List from "./component/List";
 import styled from "styled-components";
 import { useStateValue } from "./hooks/StateProvider";
 import useDebounce from "./hooks/useDebounce";
 import DispatchEvent from "./dispatchEventList";
-// import type { Restaurant } from "./type/type";
 
 const HomeContainer = styled.div`
 	width: 60%;
-	min-width: 500px;
+	min-width: 600px;
 	position: relative;
 	margin: auto;
 	.search_container {
@@ -37,7 +36,8 @@ export default function Home() {
 	const [searchInput, setSearchInput] = useState("");
 	const [{ restaurants }, dispatch] = useStateValue();
 	const [results, setResults] = useState();
-	const [sortAscend, setSortAscend] = useState(1);
+	const [sortedAscend, setSortedAscend] = useState(1);
+	const [sortedType, setSortedType] = useState("");
 	const [dataSource, setDataSource] = useState("");
 
 	useEffect(() => {
@@ -57,20 +57,45 @@ export default function Home() {
 		setSearchInput(value)
 	}
 
-	//sort by name or rate
-	const handleSortClick = (type) => {
+	const sort = ({ type, ascend }) => {
 		let sortedData = [...restaurants].sort(function (a, b) {
-			return a[type] > b[type] ? sortAscend : -sortAscend;
+			if (type === "reviews") {
+				return a[type].length > b[type].length ? ascend : -ascend;
+			}
+			return a[type] > b[type] ? ascend : -ascend;
 		});
-		setSortAscend(-sortAscend);
 		setResults(sortedData);
 		setSearchInput("");
+	}
+
+	//sort by name, rate, reviews
+	const handleSortedTypeChange = (type) => {
+		sort({ type, ascend: sortedAscend });
+		setSortedType(type);
 	};
+
+	const handleAscendChange = (value) => {
+		let ascend = parseInt(value)
+		sort({ type: sortedType, ascend });
+		setSortedAscend(parseInt(ascend));
+	}
 
 	return (
 		<HomeContainer>
 			<div className="search_container">
 				<Row style={{ width: "100%" }} type="flex" justify="space-between">
+					<Col>
+						Sorted by&nbsp;
+						<Select style={{ width: 120 }} onChange={handleSortedTypeChange}>
+							<Select.Option value="name">Name</Select.Option>
+							<Select.Option value="rate">Rate</Select.Option>
+							<Select.Option value="reviews">Reviews</Select.Option>
+						</Select>
+						<Select defaultValue="1" style={{ width: 120, marginLeft: 5 }} onChange={handleAscendChange}>
+							<Select.Option value="1">Ascend</Select.Option>
+							<Select.Option value="-1">Descend</Select.Option>
+						</Select>
+					</Col>
 					<Col>
 						<AutoComplete
 							value={searchInput}
@@ -81,16 +106,7 @@ export default function Home() {
 							placeholder="Search..."
 						/>
 					</Col>
-					<Col >
-						<Row>
-							<Col span={12}>
-								<Button shape='round' size="small" onClick={() => handleSortClick("name")}>Sort by name</Button>
-							</Col>
-							<Col span={12}>
-								<Button shape='round' size="small" onClick={() => handleSortClick("rate")}>Sort by rate</Button>
-							</Col>
-						</Row>
-					</Col>
+
 				</Row>
 			</div>
 			<List restaurants={results || restaurants}></List>
