@@ -36,7 +36,7 @@ export default function Home() {
 	const [searchInput, setSearchInput] = useState("");
 	const [{ restaurants }, dispatch] = useStateValue();
 	const [results, setResults] = useState();
-	const [sortedAscend, setSortedAscend] = useState(1);
+	const [sortedAscend, setSortedAscend] = useState(null);
 	const [sortedType, setSortedType] = useState("");
 	const [dataSource, setDataSource] = useState("");
 
@@ -57,27 +57,22 @@ export default function Home() {
 		setSearchInput(value)
 	}
 
-	const sort = ({ type, ascend }) => {
-		let sortedData = [...restaurants].sort(function (a, b) {
-			if (type === "reviews") {
-				return a[type].length > b[type].length ? ascend : -ascend;
-			}
-			return a[type] > b[type] ? ascend : -ascend;
-		});
-		setResults(sortedData);
-		setSearchInput("");
-	}
-
 	//sort by name, rate, reviews
 	const handleSortedTypeChange = (type) => {
-		sort({ type, ascend: sortedAscend });
 		setSortedType(type);
+		setSortedAscend(null)
 	};
 
 	const handleAscendChange = (value) => {
-		let ascend = parseInt(value)
-		sort({ type: sortedType, ascend });
-		setSortedAscend(parseInt(ascend));
+		let sortedData = [...restaurants].sort(function (a, b) {
+			if (sortedType === "reviews") {
+				return a[sortedType].length > b[sortedType].length ? value : -value;
+			}
+			return a[sortedType] > b[sortedType] ? value : -value;
+		});
+		setResults(sortedData);
+		setSortedAscend(value);
+		setSearchInput("");
 	}
 
 	return (
@@ -91,9 +86,9 @@ export default function Home() {
 							<Select.Option value="rate">Rate</Select.Option>
 							<Select.Option value="reviews">Reviews</Select.Option>
 						</Select>
-						<Select defaultValue="1" style={{ width: 120, marginLeft: 5 }} onChange={handleAscendChange}>
-							<Select.Option value="1">Ascend</Select.Option>
-							<Select.Option value="-1">Descend</Select.Option>
+						<Select value={sortedAscend} style={{ width: 120, marginLeft: 5 }} onChange={handleAscendChange}>
+							<Select.Option value={1}>Ascend</Select.Option>
+							<Select.Option value={-1}>Descend</Select.Option>
 						</Select>
 					</Col>
 					<Col>
